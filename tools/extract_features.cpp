@@ -139,6 +139,9 @@ int feature_extraction_pipeline(int argc, char** argv) {
     for (int i = 0; i < num_features; ++i) {
       const boost::shared_ptr<Blob<Dtype> > feature_blob =
         feature_extraction_net->blob_by_name(blob_names[i]);
+      //lets read the label too
+      const boost::shared_ptr<Blob<Dtype> > label_blob = feature_extraction_net
+                ->blob_by_name("label");
       int batch_size = feature_blob->num();
       int dim_features = feature_blob->count() / batch_size;
       const Dtype* feature_blob_data;
@@ -152,6 +155,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
             feature_blob->offset(n);
         for (int d = 0; d < dim_features; ++d) {
           datum.add_float_data(feature_blob_data[d]);
+          datum.set_label(label_blob->cpu_data()[n]);
         }
         string key_str = caffe::format_int(image_indices[i], 10);
 
